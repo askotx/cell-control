@@ -1,0 +1,39 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="utf-8"/>
+   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+   <meta name="description" content=""/>
+   <meta name="author" content="Juan Carlos Ruvalcaba"/>
+   <title></title>
+
+   <link rel="stylesheet" href="css/custom-theme/jquery-ui-1.10.3.custom.css"/>
+   <link rel="stylesheet" href="assets/css/bootstrap.min.css"/>
+   <link rel="stylesheet" href="assets/css/font-awesome.min.css"/>
+   <!--[if IE 7]>
+   <link rel="stylesheet" href="assets/css/font-awesome-ie7.min.css">
+   <![endif]-->
+   <!--[if lt IE 9]>
+   <link rel="stylesheet" href="css/custom-theme/jquery.ui.1.10.3.ie.css">
+   <![endif]-->
+</head>
+<body>
+   <header>
+      <img src="./assets/img/logo.png" style="max-width: 50%;" />
+   </header>
+   <div class="container" id="layout">
+      <button class="ui-button-success ui-btn-lg">Hello</button>
+   </div>
+   <!-- Placed at the end of the document so the pages load faster -->
+   <script src="assets/js/vendor/jquery-1.9.1.min.js" type="text/javascript"></script>
+   <script src="assets/js/vendor/jquery-migrate-1.2.1.min.js" type="text/javascript"></script>
+   <script src="assets/js/vendor/bootstrap.js" type="text/javascript"></script>
+   <script src="assets/js/vendor/holder.js" type="text/javascript"></script>
+   <script src="assets/js/vendor/jquery-ui-1.10.3.custom.min.js" type="text/javascript"></script>
+   <script type="text/javascript">
+      $(function () {
+         $("#layout button,.button,#sampleButton").button();
+      });
+   </script>
+</body>
+</html>
