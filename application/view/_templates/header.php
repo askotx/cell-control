@@ -23,7 +23,7 @@
     <link rel="stylesheet" href="<?php echo URL; ?>css/custom-theme/jquery.ui.1.10.3.ie.css">
     <![endif]-->
     
-    <link rel="stylesheet" href="<?php echo URL; ?>assets/jqGrid/css/ui.jqgrid.css" /> 
+    <link rel="stylesheet" href="<?php echo URL; ?>assets/jqGrid/css/ui.jqgrid.min.css" /> 
     <link rel="stylesheet" href="<?php echo URL; ?>assets/jqGrid/jqGrid.overrides.css" />
     
     <style>

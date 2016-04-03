@@ -4,8 +4,9 @@
     <!-- Placed at the end of the document so the pages load faster -->
     <!--
     <script src="<?php echo URL; ?>assets/js/vendor/jquery-1.9.1.min.js" type="text/javascript"></script>
-    -->
     <script src="<?php echo URL; ?>assets/js/vendor/jquery-1.11.1.min.js" type="text/javascript"></script>
+    -->
+    <script src="<?php echo URL; ?>assets/js/vendor/jquery-2.2.2.min.js" type="text/javascript"></script>
     <script src="<?php echo URL; ?>assets/js/vendor/jquery-migrate-1.2.1.min.js" type="text/javascript"></script>
     <script src="<?php echo URL; ?>assets/js/vendor/bootstrap.js" type="text/javascript"></script>
     <script src="<?php echo URL; ?>assets/js/vendor/holder.js" type="text/javascript"></script>
@@ -15,8 +16,11 @@
         $.jgrid.no_legacy_api = true;
         $.jgrid.useJSON = true;
     </script>
+    <!--
     <script src="<?php echo URL; ?>assets/jqGrid/js/jquery.jqGrid.min.js"></script>
-
+    -->
+    <script src="<?php echo URL; ?>assets/jqGrid/js/jquery.free-jqgrid-4.13.1.min.js"></script>
+    <script src="<?php echo URL; ?>assets/js/vendor/jquery-barcode-2.0.3.min.js"></script>
     <script type="text/javascript">
         $(function () {
             $("button,.button,#sampleButton").button();

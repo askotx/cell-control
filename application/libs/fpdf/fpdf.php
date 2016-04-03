@@ -18,7 +18,7 @@ protected $buffer;             // buffer holding in-memory PDF
 protected $pages;              // array containing pages
 protected $state;              // current document state
 protected $compress;           // compression flag
-protected $k;                  // scale factor (number of points in user unit)
+public $k;                  // scale factor (number of points in user unit)
 protected $DefOrientation;     // default orientation
 protected $CurOrientation;     // current orientation
 protected $StdPageSizes;       // standard page sizes
@@ -27,13 +27,13 @@ protected $CurPageSize;        // current page size
 protected $CurRotation;        // current page rotation
 protected $PageInfo;           // page-related data
 protected $wPt, $hPt;          // dimensions of current page in points
-protected $w, $h;              // dimensions of current page in user unit
+public $w, $h;              // dimensions of current page in user unit
 protected $lMargin;            // left margin
 protected $tMargin;            // top margin
 protected $rMargin;            // right margin
 protected $bMargin;            // page break margin
 protected $cMargin;            // cell margin
-protected $x, $y;              // current position in user unit
+public $x, $y;              // current position in user unit
 protected $lasth;              // height of last printed cell
 protected $LineWidth;          // line width in user unit
 protected $fontpath;           // path containing fonts
