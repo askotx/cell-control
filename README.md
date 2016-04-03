@@ -6,4 +6,3 @@ Cell Control it's a php application that uses some components:
 -free jqGrid for data displaying based on jQuery
 -FPDF for printing PDF documents
 -Barcode php and jQuery for showing barcodes on web browsers and PDF
-
