@@ -11,15 +11,14 @@
     <script src="<?php echo URL; ?>assets/js/vendor/bootstrap.js" type="text/javascript"></script>
     <script src="<?php echo URL; ?>assets/js/vendor/holder.js" type="text/javascript"></script>
     <script src="<?php echo URL; ?>assets/js/vendor/jquery-ui-1.10.3.custom.min.js" type="text/javascript"></script>
+    
     <script src="<?php echo URL; ?>assets/jqGrid/js/i18n/grid.locale-es.js"></script>
     <script type="text/javascript">
         $.jgrid.no_legacy_api = true;
         $.jgrid.useJSON = true;
     </script>
-    <!--
-    <script src="<?php echo URL; ?>assets/jqGrid/js/jquery.jqGrid.min.js"></script>
-    -->
-    <script src="<?php echo URL; ?>assets/jqGrid/js/jquery.free-jqgrid-4.13.1.min.js"></script>
+    <script src="<?php echo URL; ?>assets/jqGrid/js/jquery.jqGrid-4.7.0.min.js"></script>
+
     <script src="<?php echo URL; ?>assets/js/vendor/jquery-barcode-2.0.3.min.js"></script>
     <script type="text/javascript">
         $(function () {
