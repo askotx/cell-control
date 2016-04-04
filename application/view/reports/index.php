@@ -72,5 +72,6 @@
         <div id="detailedReportGridPager"></div>
       </div>
     </form>
+    <input type="hidden" id="hdReportId"  value="0"/>
 </div>
 <!--end static dialog-->

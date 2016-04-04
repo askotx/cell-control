@@ -1,4 +1,5 @@
 $(function() {
+    var grid = $("#demoGrid");
     reportLoadComplete = function () {
         var iCol = getColumnIndexByName(grid,'opts');
         grid.children("tbody")
@@ -18,6 +19,7 @@ $(function() {
                     },
                     click: function(e) {
                         var reportId = $(e.target).closest("tr.jqgrow").attr("id");
+                        $("#hdReportId").val(reportId);
 
                         $("#txPreventerName").val(grid.jqGrid('getCell', reportId, 'PreventerName'));
                         $("#txAssociatedName").val(grid.jqGrid('getCell', reportId, 'ElectronicAssociateName'));
@@ -25,7 +27,7 @@ $(function() {
                         
                         $("#detailedReportGrid").jqGrid('setGridParam',{ loadonce: false, datatype:'json', postData: {
                             report_id: function() { return reportId; }
-                          }}).trigger('reloadGrid');
+                        }}).trigger('reloadGrid');
                     }
                 }
               ).css({"margin-left": "5px", "display": "inline-block"})
@@ -53,11 +55,11 @@ $(function() {
                   'Telefonía','Tipo','ReportTypeId',
                   'PreventerId','ExternalSellerId', 'AssociatedId','Opciones'],
         colModel:[
-            {name:'ReportId',index:'ReportId', width:80, sorttype:"int",search:true},
-            {name:'PreventerName',index:'PreventerName', width:90, align:"center"/*, sorttype:"date", formatter:"date"*/},
-            {name:'ElectronicAssociateName',index:'ElectronicAssociateName', width:90, align:"center"},
-            {name:'ExternalSellerName',index:'ExternalSellerName', width:90, align:"center"/*, align:"right",sorttype:"float", formatter:"number"*/},
-            {name:'ReporType',index:'ReportTypeId', width:80, align:"center"/*, align:"right",sorttype:"float"*/},        
+            {name:'ReportId',index:'ReportId', width:80, align:"center", sorttype:"int",search:true},
+            {name:'PreventerName',index:'PreventerName', width:90, align:"left"/*, sorttype:"date", formatter:"date"*/},
+            {name:'ElectronicAssociateName',index:'ElectronicAssociateName', width:90, align:"left"},
+            {name:'ExternalSellerName',index:'ExternalSellerName', width:90, align:"left"/*, align:"right",sorttype:"float", formatter:"number"*/},
+            {name:'ReporType',index:'ReportTypeId', width:80, align:"left"/*, align:"right",sorttype:"float"*/},        
             {name:'ReportTypeId',index:'ReportTypeId', width:80, hidden:true/*,align:"right",sorttype:"float"*/},        
             {name:'PreventerId',index:'PreventerId', width:80, sortable:false, hidden:true},
             {name:'ExternalSellerId',index:'ExternalSellerId', width:80, sortable:false, hidden:true},
@@ -78,8 +80,11 @@ $(function() {
     });
     //$("#demoGrid").jqGrid('navGrid','#gridPager',{edit:false,del:false});
     //$("#demoGrid").jqGrid('filterToolbar',{defaultSearch:true,stringResult:true});
+    $("#demoGrid").jqGrid("setLabel","PreventerName","",{"text-align":"left"});
+    $("#demoGrid").jqGrid("setLabel","ElectronicAssociateName","",{"text-align":"left"});
+    $("#demoGrid").jqGrid("setLabel","ExternalSellerName","",{"text-align":"left"});
+    $("#demoGrid").jqGrid("setLabel","ReporType","",{"text-align":"left"});
     
-    grid = $("#demoGrid");
     getColumnIndexByName = function(grid,columnName) {
         var cm = grid.jqGrid('getGridParam','colModel'),l=cm.length;
         for (i=0; i<l; i++) {
@@ -93,14 +98,54 @@ $(function() {
     $("#modal-message").dialog({
         autoOpen: false,
         modal: true,
-        width: 750,
+        width: 825,
         buttons: {
             Cerrar: function () {
                 $(this).dialog("close");
             }
         }
     });
-
+    var detailed =  $("#detailedReportGrid");
+    var settings = {
+      output:"css",
+      bgColor: "#FFFFFF",
+      color: "#000000",
+      barWidth: 1,
+      barHeight: 20,
+      //optional settings?
+      moduleSize: 5,
+      posX: 10,
+      posY: 20,
+      addQuietZone: 1
+    };
+    detailedReportLoadComplete = function () {
+        if (detailed.jqGrid('getGridParam','datatype') === "json"){
+            detailed.jqGrid('getRowData');
+            
+            $("div.ui-jqgrid-bdiv").css("overflow-x","hidden");
+            $('#modal-message').dialog('open');
+        }
+        var rowIDs = detailed.jqGrid('getDataIDs');
+        var barcodeArray = [];
+        var i = 0;
+        for (i = 0; i < rowIDs.length ; i++){
+            var rowID = rowIDs[i];
+            var row = detailed.jqGrid ('getRowData', rowID);
+            barcodeArray.push(row.BarCode);
+        }
+        i=0;
+        var iCol = getColumnIndexByName(detailed,'opts2');
+        detailed
+            .children("tbody")
+            .children("tr.jqgrow")
+            .children("td:nth-child("+(iCol+1)+")")
+            .each(function() {
+                $("<div>",{})
+                .barcode(barcodeArray[i], "ean13", settings)
+                .appendTo($(this).children("div"));
+                i++;
+            });
+    };
     $("#detailedReportGrid").jqGrid({
         url : url + "reports/getReportsOfCellphones",
         datatype : "local",
@@ -113,42 +158,50 @@ $(function() {
         rowNum: 10,
         rowList: [10,20,30],
         caption: "Celulares en Reporte",
-        colNames:['Cel.','Marca','Color','Descripción','Codigo','MovementId'],
+        colNames:['Cel.','Marca','Color','Descripción','Codigo','MovementId','Codigo'],
         colModel:[
-            {name:'CellPhoneId',index:'CellPhoneId', width:50, align:"center"},
-            {name:'BrandName',index:'BrandName',align:"center"},
-            {name:'ColorName',index:'ColorName',align:"center"},
-            {name:'Description',index:'Description',align:"center"},
-            {name:'BarCode',index:'BarCode',align:"center"},
-            {name:'MovementId',index:'MovementId', sortable:false, hidden:true}
+            {name:'CellPhoneId',index:'CellPhoneId', align:"center"},
+            {name:'BrandName',index:'BrandName',align:"left"},
+            {name:'ColorName',index:'ColorName',align:"left" },
+            {name:'Description',index:'Description',align:"left"},
+            {name:'BarCode',index:'BarCode',align:"center", hidden:true/*, formatter:barcodeFormatter*/},
+            {name:'MovementId',index:'MovementId', sortable:false, hidden:true},
+            {name:'opts2', index: 'opts2', align: 'center', sortable: false, formatter: 'actions',
+             formatoptions: { delbutton: false, editbutton: false} }
         ],
         pager: "#detailedReportGridPager",
         viewrecords: true,
         gridview: true,
         hidegrid:true,
         altRows: true,
-        shrinkToFit:false,
-        autowidth: true,
+        shrinkToFit:true,
+        autowidth: false,
         multiselect:true,
         height: '100px',
-        loadComplete: function(data) {
-            if ($("#detailedReportGrid").jqGrid('getGridParam','datatype') === "json"){
-                $("#detailedReportGrid").jqGrid('getRowData');
-                
-                $("div.ui-jqgrid-bdiv").css("overflow-x","hidden");
-                $('#modal-message').dialog('open');
-            }
-        }
+        loadComplete: detailedReportLoadComplete
     });
-    $("#detailedReportGrid").jqGrid('navGrid','#detailedReportGridPager',{edit:false,del:false,search:false,refresh:false,add:false});
-    $("#detailedReportGrid").jqGrid('navButtonAdd', '#detailedReportGridPager',{ 
+    
+    detailed.jqGrid('navGrid','#detailedReportGridPager',{edit:false,del:false,search:false,refresh:false,add:false});
+    detailed.jqGrid('navButtonAdd', '#detailedReportGridPager',{ 
         caption: "PDF",
         buttonicon: "ui-icon-bookmark",
         onClickButton: generatePDF, position: "last"
     });
+    detailed.jqGrid("setLabel","BrandName","",{"text-align":"left"});
+    detailed.jqGrid("setLabel","ColorName","",{"text-align":"left"});
+    detailed.jqGrid("setLabel","Description","",{"text-align":"left"});
+    detailed.jqGrid("setLabel","BarCode","",{"text-align":"left"});
+    
     function generatePDF(){
-        window.open(url+'reports/printFile?report_id=1', '_blank');
+        window.open(url+'reports/printFile?report_id=' + $("#hdReportId").val(), '_blank');
     }
+
+    function barcodeFormatter(cellvalue, options, rowObject){
+        //alert(options.rowId+""+options.colModel.name);
+        return $(rowObject.BarCode).barcode(cellvalue, "ean13", settings);
+    }
+
+        
     //test responsiveness
     /*$(window).on('resize', function(event, ui) {
         // Get width of parent container
