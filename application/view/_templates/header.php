@@ -49,5 +49,4 @@
         <a href="<?php echo URL; ?>">Reportes</a>
         <a href="<?php echo URL; ?>home/exampleone">Celulares</a>
         <a href="<?php echo URL; ?>home/exampletwo">Usuarios</a>
-        <a href="<?php echo URL; ?>songs">songs</a>
     </div>

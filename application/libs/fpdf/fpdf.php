@@ -1444,7 +1444,7 @@ protected function _parsegif($file)
 	return $info;
 }
 
-protected function _out($s)
+public function _out($s)
 {
 	// Add a line to the document
 	if($this->state==2)
