@@ -42,7 +42,7 @@
     </div>
 </div>
 <!--static dialog-->
-<div id="modal-message" title="Reporte Detallado" style="overflow-x: hidden;">
+<div id="modal-message" title="Reporte Detallado" style="overflow-x: hidden;display: none;">
     <form autocomplete="nope">
     <fieldset>
       <div class="form-group row">
@@ -50,14 +50,14 @@
         <div class="col-sm-4">
           <input type="text" class="form-control" id="txPreventerName" placeholder="" autocomplete="nope"/>
           <input type="hidden" id="hdPreventerId" />
-          <input type="password" class="form-control" id="txPreventerNamePassword" autocomplete="false" readonly onfocus="this.removeAttribute('readonly');" />
+          <input type="password" class="form-control" id="txPreventerNamePassword" autocomplete="false" readonly onfocus="this.removeAttribute('readonly');" onblur="this.setAttribute('readonly','readonly');"/>
         </div>
       </div>
       <div class="form-group row">
         <label for="txAssociatedName" class="col-sm-2 form-control-label">Electrónica</label>
         <div class="col-sm-4">
           <input type="text" class="form-control" id="txAssociatedName" placeholder="" />
-          <input type="password" class="form-control" id="txAssociatedNamePassword" placeholder="" autocomplete="false" readonly onfocus="this.removeAttribute('readonly');"/>
+          <input type="password" class="form-control" id="txAssociatedNamePassword" placeholder="" autocomplete="false" readonly onfocus="this.removeAttribute('readonly');" onblur="this.setAttribute('readonly','readonly');"/>
         </div>
       </div>
       <div class="form-group row">

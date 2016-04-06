@@ -6,15 +6,24 @@ body {
     /*font-size: 100px;*/
     font-weight: bolder;
     letter-spacing: -6px;
-    color: #222;
+    color: rgb(8,114,186);
     margin: 5px 80px;
 }
 .logo .number {
-    color: #222;
+    color: rgb(8,114,186);
     opacity: 0.1;
 }
 .navigation {
     margin-left: 80px;
+}
+
+@media screen and (min-width: 1360px) {
+    .logo {
+        margin: 5px 15%;
+    }
+    .navigation {
+        margin-left: 15%;
+    }
 }
 .navigation a {
     display: inline-block;
@@ -23,12 +32,13 @@ body {
     font-size: 14px;
     text-transform: uppercase;
     font-weight: bold;
-    border: 2px solid #222;
-    background: #222;
+    border: 2px solid rgb(8,114,186);
+    background: rgb(8,114,186);
     color: #fff;
 }
 .navigation a:hover {
-    color: #222;
+    /*color: #222;*/
+    color: rgb(8,114,186);
     background: transparent;
     text-decoration: none;
 }

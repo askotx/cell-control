@@ -33,6 +33,7 @@
     <!-- our JavaScript -->
     <script src="<?php echo URL; ?>js/application.js"></script>
     <script src="<?php echo URL; ?>js/reports.js"></script>
+    <script src="<?php echo URL; ?>js/reports/report_cell_detailed.js"></script>
     <script src="<?php echo URL; ?>js/get_contacts.js"></script>
 </body>
 </html>

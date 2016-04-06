@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 4.5.5.1
+-- version 4.6.0
 -- http://www.phpmyadmin.net
 --
 -- Servidor: localhost
--- Tiempo de generación: 04-04-2016 a las 03:08:48
+-- Tiempo de generación: 06-04-2016 a las 21:25:46
 -- Versión del servidor: 5.7.11-log
--- Versión de PHP: 7.0.4
+-- Versión de PHP: 7.0.5
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
@@ -25,14 +25,16 @@ DELIMITER $$
 -- Procedimientos
 --
 CREATE DEFINER=`root`@`localhost` PROCEDURE `getCellphonesReport` (IN `reportId` INT)  BEGIN
-SELECT
-  vw_cellphoneslog.*, report_detailed.ReportId
-FROM
+SELECT vw_cellphoneslog.*, report_detailed.ReportId 
+FROM 
   report_detailed INNER JOIN
   vw_cellphoneslog
-   ON report_detailed.CellPhoneId = vw_cellphoneslog.CellPhoneId
-WHERE
-  vw_cellphoneslog.CellStatusId = 1 AND report_detailed.ReportId = reportId
+  ON report_detailed.CellPhoneId = vw_cellphoneslog.CellPhoneId
+WHERE 
+  NOT EXISTS (
+     SELECT * FROM cellmovements WHERE 
+     cellmovements.CellPhoneId=vw_cellphoneslog.CellPhoneId AND cellmovements.CellStatusId=2
+   ) AND vw_cellphoneslog.CellStatusId = 1 AND report_detailed.ReportId = 1
 ORDER BY report_detailed.CellPhoneId ASC;
 END$$
 
@@ -124,7 +126,7 @@ CREATE TABLE `cellphones` (
 --
 
 INSERT INTO `cellphones` (`CellPhoneId`, `BrandId`, `CompanyId`, `ColorId`, `Description`, `BarCode`) VALUES
-(1, 3, 2, 2, '0T4009A', '48944612304'),
+(1, 3, 2, 2, '0T4009A', '750201256825'),
 (2, 2, 2, 2, 'Neon', '750201256781'),
 (3, 4, 2, 2, 'Y530', '750201256731');
 
@@ -364,6 +366,7 @@ CREATE TABLE `users` (
 
 --
 -- Estructura Stand-in para la vista `vw_availablecontacts`
+-- (See below for the actual view)
 --
 CREATE TABLE `vw_availablecontacts` (
 `ContactName` varchar(32)
@@ -376,6 +379,7 @@ CREATE TABLE `vw_availablecontacts` (
 
 --
 -- Estructura Stand-in para la vista `vw_cellphoneslog`
+-- (See below for the actual view)
 --
 CREATE TABLE `vw_cellphoneslog` (
 `BrandName` varchar(24)
@@ -396,6 +400,7 @@ CREATE TABLE `vw_cellphoneslog` (
 
 --
 -- Estructura Stand-in para la vista `vw_phonemodels`
+-- (See below for the actual view)
 --
 CREATE TABLE `vw_phonemodels` (
 `BrandName` varchar(24)
@@ -408,6 +413,7 @@ CREATE TABLE `vw_phonemodels` (
 
 --
 -- Estructura Stand-in para la vista `vw_reports`
+-- (See below for the actual view)
 --
 CREATE TABLE `vw_reports` (
 `ReportId` int(11)
