@@ -1,4 +1,4 @@
-$(function() {    
+$(function() {
     var detailed =  $("#detailedReportGrid");
     var settings = {
       output:"css",
@@ -12,6 +12,11 @@ $(function() {
       posY: 20,
       addQuietZone: 1
     };
+    $("input[type='password'][id$='NamePassword']").focus(function() {
+        $(this).removeAttr('readonly');
+    }).blur(function(){
+        $(this).attr('readonly','readonly');
+    });
     detailedReportLoadComplete = function () {
         if (detailed.jqGrid('getGridParam','datatype') === "json"){
             detailed.jqGrid('getRowData');
