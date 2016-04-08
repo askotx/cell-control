@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Servidor: localhost
--- Tiempo de generación: 06-04-2016 a las 21:25:46
+-- Tiempo de generación: 08-04-2016 a las 21:24:39
 -- Versión del servidor: 5.7.11-log
 -- Versión de PHP: 7.0.5
 
@@ -31,10 +31,7 @@ FROM
   vw_cellphoneslog
   ON report_detailed.CellPhoneId = vw_cellphoneslog.CellPhoneId
 WHERE 
-  NOT EXISTS (
-     SELECT * FROM cellmovements WHERE 
-     cellmovements.CellPhoneId=vw_cellphoneslog.CellPhoneId AND cellmovements.CellStatusId=2
-   ) AND vw_cellphoneslog.CellStatusId = 1 AND report_detailed.ReportId = 1
+	vw_cellphoneslog.CellStatusId = 1 AND report_detailed.ReportId = reportId AND vw_cellphoneslog.MovementId = report_detailed.MovementId
 ORDER BY report_detailed.CellPhoneId ASC;
 END$$
 
@@ -47,16 +44,21 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `getReport` (IN `reportId` INT)  BEG
 	SELECT * FROM vw_reports WHERE ReportId = reportId;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `setCreateReport` (IN `preventerId` INT, IN `externalSellerId` INT, IN `associatedId` INT, IN `cellCompanyId` INT, IN `reportTypeId` INT)  MODIFIES SQL DATA
+CREATE DEFINER=`root`@`localhost` PROCEDURE `setCreateReport` (IN `preventerId` INT, IN `associatedId` INT, IN `externalSellerId` INT, IN `cellCompanyId` INT, IN `reportTypeId` INT)  MODIFIES SQL DATA
 BEGIN
-INSERT INTO reports (PreventerId,ExternalSellerId,AssociatedId,ReportTypeId,ReportStatusId) 
-VALUES(preventerId,externalSellerId,associatedId,reportTypeId,1);
+INSERT INTO reports (PreventerId,AssociatedId,ExternalSellerId,ReportTypeId,ReportStatusId) 
+VALUES(preventerId,associatedId,externalSellerId,reportTypeId,1);
 
 SET @reportId = LAST_INSERT_ID();
 
-INSERT INTO report_detailed (ReportId,CellPhoneId) SELECT @reportId, cellphones.CellPhoneId
-FROM cellphones INNER JOIN cellmovements ON cellphones.CellPhoneId = cellmovements.CellPhoneId
-WHERE cellphones.CompanyId = cellCompanyId AND cellmovements.CellStatusId = 1 ORDER BY cellphones.CellPhoneId; 
+INSERT INTO report_detailed (ReportId,CellPhoneId,MovementId) SELECT @reportId, cellphones.CellPhoneId, cellmovements.MovementId
+FROM cellphones JOIN cellmovements ON cellphones.CellPhoneId = cellmovements.CellPhoneId INNER JOIN
+  vw_cellphoneslog ON cellmovements.CellPhoneId = vw_cellphoneslog.CellPhoneId
+WHERE
+  NOT EXISTS(SELECT * FROM cellmovements
+  WHERE cellmovements.CellPhoneId = vw_cellphoneslog.CellPhoneId AND cellmovements.CellStatusId > 1 AND cellmovements.LinkedTo = vw_cellphoneslog.CellPhoneId)
+  AND cellphones.CompanyId = cellCompanyId
+ORDER BY cellphones.CellPhoneId; 
 END$$
 
 DELIMITER ;
@@ -91,20 +93,22 @@ INSERT INTO `brands` (`BrandId`, `BrandName`) VALUES
 
 CREATE TABLE `cellmovements` (
   `MovementId` int(11) NOT NULL,
+  `LinkedTo` int(11) NOT NULL DEFAULT '0',
   `CellPhoneId` int(11) NOT NULL DEFAULT '0',
-  `CellStatusId` int(11) DEFAULT '0'
+  `CellStatusId` int(11) NOT NULL DEFAULT '0',
+  `MovementDate` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Volcado de datos para la tabla `cellmovements`
 --
 
-INSERT INTO `cellmovements` (`MovementId`, `CellPhoneId`, `CellStatusId`) VALUES
-(1, 3, 1),
-(2, 3, 2),
-(3, 2, 1),
-(4, 1, 1),
-(5, 4, 1);
+INSERT INTO `cellmovements` (`MovementId`, `LinkedTo`, `CellPhoneId`, `CellStatusId`, `MovementDate`) VALUES
+(1, 0, 1, 1, '2016-03-08 10:47:08'),
+(2, 0, 2, 1, '2016-03-08 10:47:07'),
+(3, 0, 3, 1, '2016-03-08 10:47:08'),
+(4, 0, 4, 1, '2016-03-12 10:47:08'),
+(5, 1, 1, 2, '2016-03-15 10:47:32');
 
 -- --------------------------------------------------------
 
@@ -128,7 +132,8 @@ CREATE TABLE `cellphones` (
 INSERT INTO `cellphones` (`CellPhoneId`, `BrandId`, `CompanyId`, `ColorId`, `Description`, `BarCode`) VALUES
 (1, 3, 2, 2, '0T4009A', '750201256825'),
 (2, 2, 2, 2, 'Neon', '750201256781'),
-(3, 4, 2, 2, 'Y530', '750201256731');
+(3, 4, 2, 2, 'Y530', '750201256731'),
+(4, 4, 2, 3, 'L140', '750201256721');
 
 -- --------------------------------------------------------
 
@@ -275,7 +280,8 @@ CREATE TABLE `reports` (
 --
 
 INSERT INTO `reports` (`ReportId`, `PreventerId`, `ExternalSellerId`, `AssociatedId`, `ReportTypeId`, `ReportStatusId`, `ReportDateInit`, `ReportDateFinish`) VALUES
-(1, 2, 6, 7, 1, 1, '2016-03-13 22:08:42', NULL);
+(1, 2, 6, 7, 1, 1, '2016-03-13 22:08:42', NULL),
+(2, 4, 6, 10, 1, 1, '2016-04-08 20:58:52', NULL);
 
 -- --------------------------------------------------------
 
@@ -286,17 +292,21 @@ INSERT INTO `reports` (`ReportId`, `PreventerId`, `ExternalSellerId`, `Associate
 CREATE TABLE `report_detailed` (
   `ReportDetailedId` int(11) NOT NULL,
   `ReportId` int(11) NOT NULL DEFAULT '0',
-  `CellPhoneId` int(11) NOT NULL DEFAULT '0'
+  `CellPhoneId` int(11) NOT NULL DEFAULT '0',
+  `MovementId` int(11) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Volcado de datos para la tabla `report_detailed`
 --
 
-INSERT INTO `report_detailed` (`ReportDetailedId`, `ReportId`, `CellPhoneId`) VALUES
-(1, 1, 1),
-(2, 1, 2),
-(3, 1, 3);
+INSERT INTO `report_detailed` (`ReportDetailedId`, `ReportId`, `CellPhoneId`, `MovementId`) VALUES
+(1, 1, 1, 1),
+(2, 1, 2, 2),
+(3, 1, 3, 3),
+(4, 2, 2, 2),
+(5, 2, 3, 3),
+(6, 2, 4, 4);
 
 -- --------------------------------------------------------
 
@@ -393,6 +403,8 @@ CREATE TABLE `vw_cellphoneslog` (
 ,`CompanyId` int(11)
 ,`ColorId` int(11)
 ,`MovementId` int(11)
+,`LinkedTo` int(11)
+,`MovementDate` datetime
 ,`CellStatusId` int(11)
 );
 
@@ -403,7 +415,8 @@ CREATE TABLE `vw_cellphoneslog` (
 -- (See below for the actual view)
 --
 CREATE TABLE `vw_phonemodels` (
-`BrandName` varchar(24)
+`CellPhoneId` int(11)
+,`BrandName` varchar(24)
 ,`CompanyName` varchar(32)
 ,`ColorName` varchar(16)
 ,`Description` varchar(256)
@@ -443,7 +456,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 --
 DROP TABLE IF EXISTS `vw_cellphoneslog`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vw_cellphoneslog`  AS  select `brands`.`BrandName` AS `BrandName`,`external_companies`.`CompanyName` AS `CompanyName`,`colors`.`ColorName` AS `ColorName`,`cellphones`.`Description` AS `Description`,`status_types`.`Description` AS `StatusDescription`,`cellphones`.`BarCode` AS `BarCode`,`cellphones`.`CellPhoneId` AS `CellPhoneId`,`cellphones`.`BrandId` AS `BrandId`,`cellphones`.`CompanyId` AS `CompanyId`,`cellphones`.`ColorId` AS `ColorId`,`cellmovements`.`MovementId` AS `MovementId`,`cellmovements`.`CellStatusId` AS `CellStatusId` from (((((`cellphones` join `brands` on((`cellphones`.`BrandId` = `brands`.`BrandId`))) join `external_companies` on((`external_companies`.`CompanyId` = `cellphones`.`CompanyId`))) join `colors` on((`colors`.`ColorId` = `cellphones`.`ColorId`))) join `cellmovements` on((`cellphones`.`CellPhoneId` = `cellmovements`.`CellPhoneId`))) join `status_types` on((`cellmovements`.`CellStatusId` = `status_types`.`TypeId`))) where (`status_types`.`SubType` = 1) ;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vw_cellphoneslog`  AS  select `brands`.`BrandName` AS `BrandName`,`external_companies`.`CompanyName` AS `CompanyName`,`colors`.`ColorName` AS `ColorName`,`cellphones`.`Description` AS `Description`,`status_types`.`Description` AS `StatusDescription`,`cellphones`.`BarCode` AS `BarCode`,`cellphones`.`CellPhoneId` AS `CellPhoneId`,`cellphones`.`BrandId` AS `BrandId`,`cellphones`.`CompanyId` AS `CompanyId`,`cellphones`.`ColorId` AS `ColorId`,`cellmovements`.`MovementId` AS `MovementId`,`cellmovements`.`LinkedTo` AS `LinkedTo`,`cellmovements`.`MovementDate` AS `MovementDate`,`cellmovements`.`CellStatusId` AS `CellStatusId` from (((((`cellphones` join `brands` on((`cellphones`.`BrandId` = `brands`.`BrandId`))) join `external_companies` on((`external_companies`.`CompanyId` = `cellphones`.`CompanyId`))) join `colors` on((`colors`.`ColorId` = `cellphones`.`ColorId`))) join `cellmovements` on((`cellphones`.`CellPhoneId` = `cellmovements`.`CellPhoneId`))) join `status_types` on((`cellmovements`.`CellStatusId` = `status_types`.`TypeId`))) where (`status_types`.`SubType` = 1) order by `cellphones`.`CellPhoneId`,`cellmovements`.`CellStatusId` ;
 
 -- --------------------------------------------------------
 
@@ -452,7 +465,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 --
 DROP TABLE IF EXISTS `vw_phonemodels`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vw_phonemodels`  AS  select `brands`.`BrandName` AS `BrandName`,`external_companies`.`CompanyName` AS `CompanyName`,`colors`.`ColorName` AS `ColorName`,`cellphones`.`Description` AS `Description` from (((`cellphones` join `brands` on((`cellphones`.`BrandId` = `brands`.`BrandId`))) join `external_companies` on((`external_companies`.`CompanyId` = `cellphones`.`CompanyId`))) join `colors` on((`colors`.`ColorId` = `cellphones`.`ColorId`))) ;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vw_phonemodels`  AS  select `cellphones`.`CellPhoneId` AS `CellPhoneId`,`brands`.`BrandName` AS `BrandName`,`external_companies`.`CompanyName` AS `CompanyName`,`colors`.`ColorName` AS `ColorName`,`cellphones`.`Description` AS `Description` from (((`cellphones` join `brands` on((`cellphones`.`BrandId` = `brands`.`BrandId`))) join `external_companies` on((`external_companies`.`CompanyId` = `cellphones`.`CompanyId`))) join `colors` on((`colors`.`ColorId` = `cellphones`.`ColorId`))) ;
 
 -- --------------------------------------------------------
 
@@ -563,7 +576,7 @@ ALTER TABLE `cellmovements`
 -- AUTO_INCREMENT de la tabla `cellphones`
 --
 ALTER TABLE `cellphones`
-  MODIFY `CellPhoneId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `CellPhoneId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 --
 -- AUTO_INCREMENT de la tabla `colors`
 --
@@ -593,12 +606,12 @@ ALTER TABLE `relations_assignments`
 -- AUTO_INCREMENT de la tabla `reports`
 --
 ALTER TABLE `reports`
-  MODIFY `ReportId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `ReportId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 --
 -- AUTO_INCREMENT de la tabla `report_detailed`
 --
 ALTER TABLE `report_detailed`
-  MODIFY `ReportDetailedId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `ReportDetailedId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 --
 -- AUTO_INCREMENT de la tabla `request_query`
 --
