@@ -68,12 +68,13 @@ $(function() {
         rowNum: 10,
         rowList: [10,20,30],
         caption: "Celulares en Reporte",
-        colNames:['Cel.','Marca','Color','Descripción','Codigo','MovementId','Codigo'],
+        colNames:['Cel.','Marca','Color','Descripción','Stock','Codigo','MovementId','Codigo'],
         colModel:[
-            {name:'CellPhoneId',index:'CellPhoneId', align:"center"},
+            {name:'CellPhoneId',index:'CellPhoneId', align:"center", width:"30"},
             {name:'BrandName',index:'BrandName',align:"left"},
-            {name:'ColorName',index:'ColorName',align:"left" },
+            {name:'ColorName',index:'ColorName',align:"left", width:"60"},
             {name:'Description',index:'Description',align:"left"},
+            {name:'Stock',index:'Stock',align:"center", hidden:false, width:"40"},
             {name:'BarCode',index:'BarCode',align:"center", hidden:true/*, formatter:barcodeFormatter*/},
             {name:'MovementId',index:'MovementId', sortable:false, hidden:true},
             {name:'opts2', index: 'opts2', align: 'center', sortable: false, formatter: 'actions',
@@ -100,6 +101,7 @@ $(function() {
     detailed.jqGrid("setLabel","BrandName","",{"text-align":"left"});
     detailed.jqGrid("setLabel","ColorName","",{"text-align":"left"});
     detailed.jqGrid("setLabel","Description","",{"text-align":"left"});
+    //detailed.jqGrid("setLabel","Description","",{"text-align":"left"});
     detailed.jqGrid("setLabel","BarCode","",{"text-align":"left"});
     
     function generatePDF(){
